@@ -2,7 +2,7 @@ replicaCount: 1
 
 image:
   repository: ghcr.io/your-username/training-app
-  tag: 2ab100aaa7f4f64e86d9e8c0f3bddd8285a8047a
+  tag: c7576ce0db804cf41cde957050b12f4dfbe91dfc
   pullPolicy: IfNotPresent
 
 service:

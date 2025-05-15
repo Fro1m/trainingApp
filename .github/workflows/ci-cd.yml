@@ -64,7 +64,14 @@ jobs:
           labels: ${{ steps.meta.outputs.labels }}
 
       - name: Create update PR
+        env:
+          GITHUB_TOKEN: ${{ secrets.PAT_TOKEN }}
         run: |
+          # Configure git to use the token
+          git config --global user.name 'GitHub Action'
+          git config --global user.email 'action@github.com'
+          git remote set-url origin https://x-access-token:${GITHUB_TOKEN}@github.com/${{ github.repository }}.git
+          
           # Create a new branch for the update
           git checkout -b update-image-tag-${{ github.sha }}
           
@@ -73,8 +80,6 @@ jobs:
           sed -i "s/tag: .*/tag: ${{ github.sha }}/" values.yaml
           
           # Commit and push the changes
-          git config --global user.name 'GitHub Action'
-          git config --global user.email 'action@github.com'
           git add values.yaml
           git commit -m "Update image tag to ${{ github.sha }}"
           git push origin update-image-tag-${{ github.sha }}

@@ -1,8 +1,8 @@
 backend:
   replicaCount: 1
   image:
-    repository: fro1m/training-app
-    tag: latest
+    repository: fro1m/training-app-frontend
+    tag: f38a6c29270ab960a664a56df6a7f0e6710e3953
     pullPolicy: IfNotPresent
   service:
     type: ClusterIP
@@ -19,7 +19,7 @@ frontend:
   replicaCount: 1
   image:
     repository: fro1m/training-app-frontend
-    tag: latest
+    tag: f38a6c29270ab960a664a56df6a7f0e6710e3953
     pullPolicy: IfNotPresent
   service:
     type: ClusterIP

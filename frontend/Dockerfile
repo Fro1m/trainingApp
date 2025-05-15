@@ -1,4 +1,4 @@
-# Build stage
+# Build stage.
 FROM node:16-alpine as build
 
 # Set working directory

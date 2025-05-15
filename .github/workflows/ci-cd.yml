@@ -65,6 +65,8 @@ jobs:
           labels: ${{ steps.meta.outputs.labels }}
 
       - name: Create update PR
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           # Create a new branch
           BRANCH_NAME="update-image-tag-${{ github.sha }}"
@@ -81,13 +83,12 @@ jobs:
           git commit -m "Update image tag to ${{ github.sha }}"
           
           # Push using GitHub CLI
-          echo "${{ secrets.GITHUB_TOKEN }}" | gh auth login --with-token
+          echo "$GITHUB_TOKEN" | gh auth login --with-token
           git push origin $BRANCH_NAME
           
-          # Create PR using GitHub CLI with explicit token
+          # Create PR using GitHub CLI
           gh pr create \
             --title "Update image tag to ${{ github.sha }}" \
             --body "Automated update of image tag for deployment" \
             --base main \
-            --head $BRANCH_NAME \
-            --token "${{ secrets.GITHUB_TOKEN }}" 
+            --head $BRANCH_NAME 

@@ -80,7 +80,7 @@ jobs:
           git commit -m "Update image tag to ${{ github.sha }}"
           
           # Push using GitHub CLI
-          gh auth setup-git
+          echo "${{ secrets.GITHUB_TOKEN }}" | gh auth login --with-token
           git push origin $BRANCH_NAME
           
           # Create PR using GitHub CLI

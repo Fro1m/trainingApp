@@ -1,8 +1,8 @@
 backend:
   replicaCount: 1
   image:
-    repository: fro1m/training-app-frontend
-    tag: d37674b2b1b2a1cc61e64a0f3da36aa2202b3284
+    repository: fro1m/training-app
+    tag: 570652798ca8a79c5ee4d4339eaca215bf4e762f
     pullPolicy: IfNotPresent
   service:
     type: ClusterIP
@@ -18,8 +18,8 @@ backend:
 frontend:
   replicaCount: 1
   image:
-    repository: fro1m/training-app-frontend
-    tag: d37674b2b1b2a1cc61e64a0f3da36aa2202b3284
+    repository: fro1m/training-app
+    tag: 570652798ca8a79c5ee4d4339eaca215bf4e762f
     pullPolicy: IfNotPresent
   service:
     type: LoadBalancer

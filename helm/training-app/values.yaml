@@ -2,7 +2,7 @@ replicaCount: 1
 
 image:
   repository: ghcr.io/your-username/training-app
-  tag: latest  # This will be updated by ArgoCD Image Updater
+  tag: 2ab100aaa7f4f64e86d9e8c0f3bddd8285a8047a
   pullPolicy: IfNotPresent
 
 service:

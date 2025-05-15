@@ -66,7 +66,7 @@ jobs:
 
       - name: Create update PR
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.PAT_TOKEN }}
         run: |
           # Create a new branch
           BRANCH_NAME="update-image-tag-${{ github.sha }}"
@@ -83,6 +83,7 @@ jobs:
           git commit -m "Update image tag to ${{ github.sha }}"
           
           # Push the changes
+          git remote set-url origin https://x-access-token:${GITHUB_TOKEN}@github.com/${{ github.repository }}.git
           git push origin $BRANCH_NAME
           
           # Create PR using GitHub API

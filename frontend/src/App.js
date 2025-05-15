@@ -1,4 +1,4 @@
-import React, { useState, useCallback } from 'react';
+import React from 'react';
 import { 
   ThemeProvider, 
   createTheme, 
@@ -11,16 +11,20 @@ import {
   Box,
   useMediaQuery,
   useTheme,
-  Zoom,
-  Snackbar,
-  Alert
+  Zoom
 } from '@mui/material';
 import { styled } from '@mui/material/styles';
 import { useSwipeable } from 'react-swipeable';
+import { BrowserRouter as Router, Routes, Route, useNavigate } from 'react-router-dom';
 import FitnessCenterIcon from '@mui/icons-material/FitnessCenter';
 import RestaurantIcon from '@mui/icons-material/Restaurant';
 import MonitorWeightIcon from '@mui/icons-material/MonitorWeight';
 import PhotoLibraryIcon from '@mui/icons-material/PhotoLibrary';
+
+import Workouts from './pages/Workouts';
+import Nutrition from './pages/Nutrition';
+import Weight from './pages/Weight';
+import Photos from './pages/Photos';
 
 // Create RTL theme
 const theme = createTheme({
@@ -115,58 +119,58 @@ const useSwipeHandlers = (onSwipe) => {
   });
 };
 
-function App() {
+function HomePage() {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
-  const [activeCard, setActiveCard] = useState(null);
-  const [showSnackbar, setShowSnackbar] = useState(false);
-  const [snackbarMessage, setSnackbarMessage] = useState('');
+  const navigate = useNavigate();
+  const [activeCard, setActiveCard] = React.useState(null);
 
   const menuItems = [
     {
       title: 'אימונים',
       icon: <FitnessCenterIcon />,
       description: 'תוכניות אימון מותאמות אישית',
+      path: '/workouts'
     },
     {
       title: 'תזונה',
       icon: <RestaurantIcon />,
       description: 'תוכניות תזונה מאוזנות',
+      path: '/nutrition'
     },
     {
       title: 'שקילות',
       icon: <MonitorWeightIcon />,
       description: 'מעקב אחר התקדמות',
+      path: '/weight'
     },
     {
       title: 'תמונות מהתהליך',
       icon: <PhotoLibraryIcon />,
       description: 'תיעוד השינוי',
+      path: '/photos'
     },
   ];
 
-  const handleCardClick = useCallback((index) => {
-    setActiveCard(index);
-    setSnackbarMessage(`נבחר ${menuItems[index].title}`);
-    setShowSnackbar(true);
-  }, [menuItems]);
+  const handleCardClick = (path) => {
+    navigate(path);
+  };
 
-  const handleSwipe = useCallback((index, direction) => {
-    setActiveCard(index);
-    const action = direction === 'right' ? 'נבחר' : 'נדחה';
-    setSnackbarMessage(`${action} ${menuItems[index].title}`);
-    setShowSnackbar(true);
-  }, [menuItems]);
+  const handleSwipe = (path, direction) => {
+    if (direction === 'right') {
+      navigate(path);
+    }
+  };
 
   const CardWithSwipe = ({ index, item }) => {
-    const swipeHandlers = useSwipeHandlers((direction) => handleSwipe(index, direction));
+    const swipeHandlers = useSwipeHandlers((direction) => handleSwipe(item.path, direction));
     
     return (
       <Zoom in={true} style={{ transitionDelay: `${index * 100}ms` }}>
         <div {...swipeHandlers}>
           <StyledCard 
             isSwiping={activeCard === index}
-            onClick={() => handleCardClick(index)}
+            onClick={() => handleCardClick(item.path)}
           >
             <CardContent sx={{ 
               textAlign: 'center', 
@@ -204,49 +208,48 @@ function App() {
   };
 
   return (
+    <GradientBackground>
+      <Container maxWidth="lg">
+        <Typography
+          variant="h2"
+          component="h1"
+          align="center"
+          color="white"
+          gutterBottom
+          sx={{
+            fontWeight: 'bold',
+            mb: { xs: 4, sm: 6 },
+            textShadow: '2px 2px 4px rgba(0,0,0,0.2)',
+          }}
+        >
+          ברוכים הבאים לאפליקציית האימון
+        </Typography>
+        
+        <Grid container spacing={{ xs: 2, sm: 3, md: 4 }}>
+          {menuItems.map((item, index) => (
+            <Grid item xs={12} sm={6} md={3} key={index}>
+              <CardWithSwipe index={index} item={item} />
+            </Grid>
+          ))}
+        </Grid>
+      </Container>
+    </GradientBackground>
+  );
+}
+
+function App() {
+  return (
     <ThemeProvider theme={theme}>
       <CssBaseline />
-      <GradientBackground>
-        <Container maxWidth="lg">
-          <Typography
-            variant="h2"
-            component="h1"
-            align="center"
-            color="white"
-            gutterBottom
-            sx={{
-              fontWeight: 'bold',
-              mb: { xs: 4, sm: 6 },
-              textShadow: '2px 2px 4px rgba(0,0,0,0.2)',
-            }}
-          >
-            ברוכים הבאים לאפליקציית האימון
-          </Typography>
-          
-          <Grid container spacing={{ xs: 2, sm: 3, md: 4 }}>
-            {menuItems.map((item, index) => (
-              <Grid item xs={12} sm={6} md={3} key={index}>
-                <CardWithSwipe index={index} item={item} />
-              </Grid>
-            ))}
-          </Grid>
-        </Container>
-      </GradientBackground>
-
-      <Snackbar
-        open={showSnackbar}
-        autoHideDuration={2000}
-        onClose={() => setShowSnackbar(false)}
-        anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
-      >
-        <Alert 
-          onClose={() => setShowSnackbar(false)} 
-          severity="success" 
-          sx={{ width: '100%' }}
-        >
-          {snackbarMessage}
-        </Alert>
-      </Snackbar>
+      <Router>
+        <Routes>
+          <Route path="/" element={<HomePage />} />
+          <Route path="/workouts" element={<Workouts />} />
+          <Route path="/nutrition" element={<Nutrition />} />
+          <Route path="/weight" element={<Weight />} />
+          <Route path="/photos" element={<Photos />} />
+        </Routes>
+      </Router>
     </ThemeProvider>
   );
 }

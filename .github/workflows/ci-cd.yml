@@ -37,6 +37,7 @@ jobs:
     if: github.event_name == 'push' && github.ref == 'refs/heads/main'
     permissions:
       contents: write
+      pull-requests: write
       packages: write
       
     steps:
@@ -83,9 +84,10 @@ jobs:
           echo "${{ secrets.GITHUB_TOKEN }}" | gh auth login --with-token
           git push origin $BRANCH_NAME
           
-          # Create PR using GitHub CLI
+          # Create PR using GitHub CLI with explicit token
           gh pr create \
             --title "Update image tag to ${{ github.sha }}" \
             --body "Automated update of image tag for deployment" \
             --base main \
-            --head $BRANCH_NAME 
+            --head $BRANCH_NAME \
+            --token "${{ secrets.GITHUB_TOKEN }}" 

@@ -36,7 +36,7 @@ jobs:
     runs-on: ubuntu-latest
     if: github.event_name == 'push' && github.ref == 'refs/heads/main'
     permissions:
-      contents: read
+      contents: write
       packages: write
       
     steps:
@@ -64,29 +64,28 @@ jobs:
           labels: ${{ steps.meta.outputs.labels }}
 
       - name: Create update PR
-        env:
-          GITHUB_TOKEN: ${{ secrets.PAT_TOKEN }}
         run: |
-          # Configure git to use the token
-          git config --global user.name 'GitHub Action'
-          git config --global user.email 'action@github.com'
-          git remote set-url origin https://x-access-token:${GITHUB_TOKEN}@github.com/${{ github.repository }}.git
-          
-          # Create a new branch for the update
-          git checkout -b update-image-tag-${{ github.sha }}
+          # Create a new branch
+          BRANCH_NAME="update-image-tag-${{ github.sha }}"
+          git checkout -b $BRANCH_NAME
           
           # Update the values.yaml with the new tag
           cd helm/training-app
           sed -i "s/tag: .*/tag: ${{ github.sha }}/" values.yaml
           
-          # Commit and push the changes
+          # Commit the changes
+          git config --global user.name 'GitHub Action'
+          git config --global user.email 'action@github.com'
           git add values.yaml
           git commit -m "Update image tag to ${{ github.sha }}"
-          git push origin update-image-tag-${{ github.sha }}
           
-          # Create PR
+          # Push using GitHub CLI
+          gh auth setup-git
+          git push origin $BRANCH_NAME
+          
+          # Create PR using GitHub CLI
           gh pr create \
             --title "Update image tag to ${{ github.sha }}" \
             --body "Automated update of image tag for deployment" \
             --base main \
-            --head update-image-tag-${{ github.sha }} 
+            --head $BRANCH_NAME 

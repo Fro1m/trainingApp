@@ -2,7 +2,7 @@ replicaCount: 1
 
 image:
   repository: fro1m/training-app
-  tag: 23707fb1cd9900039197f93360f7b3de86734f45
+  tag: 835ef7966afb0350f316a4a1708fa5426971d70e
   pullPolicy: IfNotPresent
 
 service:

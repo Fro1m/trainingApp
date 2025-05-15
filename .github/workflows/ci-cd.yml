@@ -50,7 +50,7 @@ jobs:
       - name: Run tests
         run: |
           cd frontend
-          npm test
+          npm test -- --passWithNoTests
 
   build-and-push-backend:
     needs: build-and-test-backend

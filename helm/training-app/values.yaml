@@ -18,7 +18,7 @@ backend:
 frontend:
   replicaCount: 1
   image:
-    repository: fro1m/training-app
+    repository: fro1m/training-app-frontend
     tag: 7c875405387478804f23e41240c2e11ba92c6fd5
     pullPolicy: IfNotPresent
   service:

@@ -8,10 +8,11 @@ on:
 
 env:
   REGISTRY: docker.io
-  IMAGE_NAME: ${{ secrets.DOCKERHUB_USERNAME }}/training-app
+  BACKEND_IMAGE_NAME: ${{ secrets.DOCKERHUB_USERNAME }}/training-app
+  FRONTEND_IMAGE_NAME: ${{ secrets.DOCKERHUB_USERNAME }}/training-app-frontend
 
 jobs:
-  build-and-test:
+  build-and-test-backend:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
@@ -31,8 +32,28 @@ jobs:
           cd backend
           python -m pytest
 
-  build-and-push:
-    needs: build-and-test
+  build-and-test-frontend:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '16'
+          
+      - name: Install dependencies
+        run: |
+          cd frontend
+          npm install
+          
+      - name: Run tests
+        run: |
+          cd frontend
+          npm test
+
+  build-and-push-backend:
+    needs: build-and-test-backend
     runs-on: ubuntu-latest
     if: github.event_name == 'push' && github.ref == 'refs/heads/main'
     permissions:
@@ -53,7 +74,7 @@ jobs:
         id: meta
         uses: docker/metadata-action@v4
         with:
-          images: ${{ env.IMAGE_NAME }}
+          images: ${{ env.BACKEND_IMAGE_NAME }}
           tags: |
             type=sha,format=short
             type=raw,value=latest,enable={{is_default_branch}}
@@ -66,24 +87,24 @@ jobs:
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
 
-      - name: Create update PR
+      - name: Create update PR for backend
         env:
           GITHUB_TOKEN: ${{ secrets.PAT_TOKEN }}
         run: |
           # Create a new branch
-          BRANCH_NAME="update-image-tag-${{ github.sha }}"
+          BRANCH_NAME="update-backend-image-tag-${{ github.sha }}"
           git checkout -b $BRANCH_NAME
           
           # Update the values.yaml with the new tag
           cd helm/training-app
-          sed -i "s|repository: .*|repository: ${{ env.IMAGE_NAME }}|" values.yaml
+          sed -i "s|repository: .*|repository: ${{ env.BACKEND_IMAGE_NAME }}|" values.yaml
           sed -i "s/tag: .*/tag: ${{ github.sha }}/" values.yaml
           
           # Commit the changes
           git config --global user.name 'GitHub Action'
           git config --global user.email 'action@github.com'
           git add values.yaml
-          git commit -m "Update image tag to ${{ github.sha }}"
+          git commit -m "Update backend image tag to ${{ github.sha }}"
           
           # Push the changes
           git remote set-url origin https://x-access-token:${GITHUB_TOKEN}@github.com/${{ github.repository }}.git
@@ -95,8 +116,78 @@ jobs:
             -H "Accept: application/vnd.github.v3+json" \
             https://api.github.com/repos/${{ github.repository }}/pulls \
             -d '{
-              "title": "Update image tag to '"${{ github.sha }}"'",
-              "body": "Automated update of image tag for deployment",
+              "title": "Update backend image tag to '"${{ github.sha }}"'",
+              "body": "Automated update of backend image tag for deployment",
+              "head": "'"$BRANCH_NAME"'",
+              "base": "main"
+            }'
+
+  build-and-push-frontend:
+    needs: build-and-test-frontend
+    runs-on: ubuntu-latest
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    permissions:
+      contents: write
+      pull-requests: write
+      packages: write
+      
+    steps:
+      - uses: actions/checkout@v3
+      
+      - name: Log in to Docker Hub
+        uses: docker/login-action@v2
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+          
+      - name: Extract metadata (tags, labels) for Docker
+        id: meta
+        uses: docker/metadata-action@v4
+        with:
+          images: ${{ env.FRONTEND_IMAGE_NAME }}
+          tags: |
+            type=sha,format=short
+            type=raw,value=latest,enable={{is_default_branch}}
+          
+      - name: Build and push Docker image
+        uses: docker/build-push-action@v4
+        with:
+          context: ./frontend
+          push: true
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+
+      - name: Create update PR for frontend
+        env:
+          GITHUB_TOKEN: ${{ secrets.PAT_TOKEN }}
+        run: |
+          # Create a new branch
+          BRANCH_NAME="update-frontend-image-tag-${{ github.sha }}"
+          git checkout -b $BRANCH_NAME
+          
+          # Update the values.yaml with the new tag
+          cd helm/training-app
+          sed -i "s|repository: .*|repository: ${{ env.FRONTEND_IMAGE_NAME }}|" values.yaml
+          sed -i "s/tag: .*/tag: ${{ github.sha }}/" values.yaml
+          
+          # Commit the changes
+          git config --global user.name 'GitHub Action'
+          git config --global user.email 'action@github.com'
+          git add values.yaml
+          git commit -m "Update frontend image tag to ${{ github.sha }}"
+          
+          # Push the changes
+          git remote set-url origin https://x-access-token:${GITHUB_TOKEN}@github.com/${{ github.repository }}.git
+          git push origin $BRANCH_NAME
+          
+          # Create PR using GitHub API
+          curl -X POST \
+            -H "Authorization: token $GITHUB_TOKEN" \
+            -H "Accept: application/vnd.github.v3+json" \
+            https://api.github.com/repos/${{ github.repository }}/pulls \
+            -d '{
+              "title": "Update frontend image tag to '"${{ github.sha }}"'",
+              "body": "Automated update of frontend image tag for deployment",
               "head": "'"$BRANCH_NAME"'",
               "base": "main"
             }' 

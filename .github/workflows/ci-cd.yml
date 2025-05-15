@@ -97,8 +97,8 @@ jobs:
           
           # Update the values.yaml with the new tag
           cd helm/training-app
-          sed -i "s|repository: .*|repository: ${{ env.BACKEND_IMAGE_NAME }}|" values.yaml
-          sed -i "s/tag: .*/tag: ${{ github.sha }}/" values.yaml
+          # Update only the backend section
+          sed -i '/backend:/,/frontend:/{/tag:/s/tag: .*/tag: '"${{ github.sha }}"'/}' values.yaml
           
           # Commit the changes
           git config --global user.name 'GitHub Action'
@@ -167,8 +167,8 @@ jobs:
           
           # Update the values.yaml with the new tag
           cd helm/training-app
-          sed -i "s|repository: .*|repository: ${{ env.FRONTEND_IMAGE_NAME }}|" values.yaml
-          sed -i "s/tag: .*/tag: ${{ github.sha }}/" values.yaml
+          # Update only the frontend section
+          sed -i '/frontend:/,/nodeSelector:/{/tag:/s/tag: .*/tag: '"${{ github.sha }}"'/}' values.yaml
           
           # Commit the changes
           git config --global user.name 'GitHub Action'

@@ -1,8 +1,8 @@
 replicaCount: 1
 
 image:
-  repository: ghcr.io/Fro1m/training-app
-  tag: c7576ce0db804cf41cde957050b12f4dfbe91dfc
+  repository: fro1m/training-app
+  tag: latest
   pullPolicy: IfNotPresent
 
 service:

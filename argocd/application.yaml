@@ -6,7 +6,7 @@ metadata:
 spec:
   project: default
   source:
-    repoURL: https://github.com/your-username/training-app.git
+    repoURL: https://github.com/Fro1m/trainingApp
     targetRevision: HEAD
     path: helm/training-app
   destination:

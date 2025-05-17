@@ -19,7 +19,7 @@ frontend:
   replicaCount: 1
   image:
     repository: fro1m/training-app-frontend
-    tag: c403137e880ff2cfd6e39ca0e8658260696d6943
+    tag: 4c4b6d2a2b851f450934323b3e0bd7d771d5caca
     pullPolicy: IfNotPresent
   service:
     type: LoadBalancer

@@ -27,6 +27,11 @@ spec:
               protocol: TCP
           resources:
             {{- toYaml .Values.frontend.resources | nindent 12 }}
-          env:
-            - name: REACT_APP_API_URL
-              value: "http://{{ include "training-app.fullname" . }}-backend:{{ .Values.backend.service.port }}/api" 
+          volumeMounts:
+            - name: frontend-config
+              mountPath: /usr/share/nginx/html/config.js
+              subPath: config.js
+      volumes:
+        - name: frontend-config
+          configMap:
+            name: {{ include "training-app.fullname" . }}-frontend-config 

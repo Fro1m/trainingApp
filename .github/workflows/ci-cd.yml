@@ -30,7 +30,7 @@ jobs:
     - name: Run tests
       run: |
         cd backend
-        python -m pytest
+        TESTING=true python -m pytest
 
   build-and-test-frontend:
     runs-on: ubuntu-latest

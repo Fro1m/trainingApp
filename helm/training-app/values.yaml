@@ -2,7 +2,7 @@ backend:
   replicaCount: 1
   image:
     repository: fro1m/training-app
-    tag: c8ac81eaefff295240161a6468a3aeac957afba5
+    tag: fdec029df123de7dab321fb8d6053aa0d6b587b0
     pullPolicy: IfNotPresent
   service:
     type: ClusterIP

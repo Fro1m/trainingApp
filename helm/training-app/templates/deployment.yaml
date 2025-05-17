@@ -26,4 +26,35 @@ spec:
               containerPort: {{ .Values.backend.service.port }}
               protocol: TCP
           resources:
-            {{- toYaml .Values.backend.resources | nindent 12 }} 
+            {{- toYaml .Values.backend.resources | nindent 12 }}
+          env:
+            - name: ENV
+              value: "production"
+            - name: DB_USER
+              valueFrom:
+                secretKeyRef:
+                  name: postgres-secret
+                  key: username
+            - name: DB_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: postgres-secret
+                  key: password
+            - name: DB_HOST
+              value: postgres
+            - name: DB_PORT
+              value: "5432"
+            - name: DB_NAME
+              value: training_app
+          readinessProbe:
+            httpGet:
+              path: /
+              port: 8000
+            initialDelaySeconds: 5
+            periodSeconds: 10
+          livenessProbe:
+            httpGet:
+              path: /
+              port: 8000
+            initialDelaySeconds: 15
+            periodSeconds: 20 

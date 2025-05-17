@@ -5,5 +5,5 @@ metadata:
 data:
   config.js: |
     window.ENV = {
-      API_URL: 'http://{{ include "training-app.fullname" . }}-backend:{{ .Values.backend.service.port }}/api'
+      API_URL: '/api'
     }; 

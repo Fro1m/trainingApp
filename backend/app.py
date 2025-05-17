@@ -1,17 +1,28 @@
-from flask import Flask, jsonify
-from flask_cors import CORS
-from dotenv import load_dotenv
-import os
+from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
+from routes import workouts
+from database import engine, Base
 
-# Load environment variables
-load_dotenv()
+# Create database tables
+Base.metadata.create_all(bind=engine)
 
-app = Flask(__name__)
-CORS(app)  # Enable CORS for all routes
+app = FastAPI()
 
-@app.route('/api/test', methods=['GET'])
-def test_route():
-    return jsonify({"message": "Hello from Flask!"})
+# Configure CORS
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],  # Allow all origins for development
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
+# Include routers
+app.include_router(workouts.router, prefix="/api", tags=["workouts"])
+
+@app.get("/")
+def read_root():
+    return {"message": "Welcome to the Training App API"}
 
 if __name__ == '__main__':
     app.run(debug=True, port=5000) 

@@ -21,7 +21,7 @@ import RestaurantIcon from '@mui/icons-material/Restaurant';
 import MonitorWeightIcon from '@mui/icons-material/MonitorWeight';
 import PhotoLibraryIcon from '@mui/icons-material/PhotoLibrary';
 
-import Workouts from './pages/Workouts';
+import TrainingPage from './pages/TrainingPage';
 import Nutrition from './pages/Nutrition';
 import Weight from './pages/Weight';
 import Photos from './pages/Photos';
@@ -130,7 +130,7 @@ function HomePage() {
       title: 'אימונים',
       icon: <FitnessCenterIcon />,
       description: 'תוכניות אימון מותאמות אישית',
-      path: '/workouts'
+      path: '/training'
     },
     {
       title: 'תזונה',
@@ -244,7 +244,7 @@ function App() {
       <Router>
         <Routes>
           <Route path="/" element={<HomePage />} />
-          <Route path="/workouts" element={<Workouts />} />
+          <Route path="/training" element={<TrainingPage />} />
           <Route path="/nutrition" element={<Nutrition />} />
           <Route path="/weight" element={<Weight />} />
           <Route path="/photos" element={<Photos />} />

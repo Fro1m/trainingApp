@@ -25,4 +25,5 @@ def read_root():
     return {"message": "Welcome to the Training App API"}
 
 if __name__ == '__main__':
-    app.run(debug=True, port=5000) 
+    import uvicorn
+    uvicorn.run(app, host="0.0.0.0", port=8000) 

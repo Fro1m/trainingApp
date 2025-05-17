@@ -1,6 +1,8 @@
 import axios from 'axios';
 
+console.log('Window ENV:', window.ENV);
 const API_URL = window.ENV?.API_URL || 'http://localhost:8000/api';
+console.log('Using API_URL:', API_URL);
 
 // Create axios instance with default config
 const api = axios.create({

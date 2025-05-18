@@ -83,6 +83,39 @@ const trainingService = {
             console.error('Error in getExerciseHistory:', error);
             throw error;
         }
+    },
+
+    // Get exercise history for weight progress chart
+    getExerciseHistoryWeight: async (exerciseId) => {
+        try {
+            const response = await axios.get(`${API_URL}/exercises/${exerciseId}/history`);
+            return response.data;
+        } catch (error) {
+            console.error('Error fetching exercise history:', error);
+            throw error;
+        }
+    },
+
+    // Get scheduled workouts for calendar
+    getScheduledWorkouts: async () => {
+        try {
+            const response = await axios.get(`${API_URL}/workouts/scheduled`);
+            return response.data;
+        } catch (error) {
+            console.error('Error fetching scheduled workouts:', error);
+            throw error;
+        }
+    },
+
+    // Get workout statistics
+    getWorkoutStats: async () => {
+        try {
+            const response = await axios.get(`${API_URL}/workouts/stats`);
+            return response.data;
+        } catch (error) {
+            console.error('Error fetching workout statistics:', error);
+            throw error;
+        }
     }
 };
 

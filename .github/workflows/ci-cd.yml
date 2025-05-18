@@ -13,6 +13,9 @@ on:
         required: true
         type: boolean
         default: true
+  pull_request:
+    types: [closed]
+    branches: [main]
 
 env:
   REGISTRY: docker.io
@@ -20,6 +23,15 @@ env:
   FRONTEND_IMAGE_NAME: ${{ secrets.DOCKERHUB_USERNAME }}/training-app-frontend
 
 jobs:
+  cleanup-branches:
+    if: github.event.pull_request.merged == true
+    runs-on: ubuntu-latest
+    steps:
+      - name: Delete branch
+        run: |
+          git remote set-url origin https://x-access-token:${{ secrets.PAT_TOKEN }}@github.com/${{ github.repository }}.git
+          git push origin --delete ${{ github.event.pull_request.head.ref }}
+
   build-and-test-backend:
     if: ${{ github.event.inputs.build_backend == 'true' }}
     runs-on: ubuntu-latest

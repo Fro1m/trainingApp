@@ -1,10 +1,18 @@
 name: CI/CD Pipeline
 
 on:
-  push:
-    branches: [ main ]
-  pull_request:
-    branches: [ main ]
+  workflow_dispatch:
+    inputs:
+      build_backend:
+        description: 'Build and deploy backend'
+        required: true
+        type: boolean
+        default: true
+      build_frontend:
+        description: 'Build and deploy frontend'
+        required: true
+        type: boolean
+        default: true
 
 env:
   REGISTRY: docker.io
@@ -13,6 +21,7 @@ env:
 
 jobs:
   build-and-test-backend:
+    if: ${{ github.event.inputs.build_backend == 'true' }}
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v3
@@ -33,6 +42,7 @@ jobs:
         TESTING=true python -m pytest
 
   build-and-test-frontend:
+    if: ${{ github.event.inputs.build_frontend == 'true' }}
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v3
@@ -54,8 +64,8 @@ jobs:
 
   build-and-push-backend:
     needs: build-and-test-backend
+    if: ${{ github.event.inputs.build_backend == 'true' }}
     runs-on: ubuntu-latest
-    if: github.event_name == 'push' && github.ref == 'refs/heads/main' && !contains(github.event.head_commit.message, 'Update backend image tag')
     permissions:
       contents: write
       pull-requests: write
@@ -118,8 +128,8 @@ jobs:
 
   build-and-push-frontend:
     needs: build-and-test-frontend
+    if: ${{ github.event.inputs.build_frontend == 'true' }}
     runs-on: ubuntu-latest
-    if: github.event_name == 'push' && github.ref == 'refs/heads/main' && !contains(github.event.head_commit.message, 'Update frontend image tag')
     permissions:
       contents: write
       pull-requests: write

@@ -6,17 +6,18 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-# Check if we're in a test environment
+# Check if we're in a test environment or local development
 is_test = os.getenv("TESTING", "false").lower() == "true"
+is_local = os.getenv("ENVIRONMENT", "development").lower() == "development"
 
-if is_test:
-    # Use SQLite for testing
-    SQLALCHEMY_DATABASE_URL = "sqlite:///./test.db"
+if is_test or is_local:
+    # Use SQLite for testing and local development
+    SQLALCHEMY_DATABASE_URL = "sqlite:///./training_app.db"
     engine = create_engine(
         SQLALCHEMY_DATABASE_URL, connect_args={"check_same_thread": False}
     )
 else:
-    # Use PostgreSQL for production/development
+    # Use PostgreSQL for production
     DB_USER = os.getenv("DB_USER", "postgres")
     DB_PASSWORD = os.getenv("DB_PASSWORD", "postgres")
     DB_HOST = os.getenv("DB_HOST", "postgres")

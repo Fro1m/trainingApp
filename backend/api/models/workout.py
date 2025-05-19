@@ -1,7 +1,7 @@
 from sqlalchemy import Column, Integer, String, ForeignKey, DateTime, Boolean
 from sqlalchemy.orm import relationship
+from database import Base
 from datetime import datetime
-from ..database import Base
 
 class Workout(Base):
     __tablename__ = "workouts"
@@ -20,7 +20,7 @@ class Workout(Base):
 
     # Relationships
     user = relationship("User", back_populates="workouts")
-    exercises = relationship("Exercise", back_populates="workout", cascade="all, delete-orphan")
+    muscle_groups = relationship("MuscleGroup", back_populates="workout", cascade="all, delete-orphan")
 
     def complete(self):
         self.is_completed = True

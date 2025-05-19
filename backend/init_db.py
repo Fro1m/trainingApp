@@ -1,16 +1,28 @@
+import os
+import sys
+
+# Get the absolute path of the backend directory
+backend_dir = os.path.dirname(os.path.abspath(__file__))
+# Add the backend directory to Python path
+sys.path.insert(0, backend_dir)
+
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
-from api.database import Base
+from database import Base
 from api.models.user import User
 from api.models.workout import Workout
 from api.models.exercise import Exercise, WeightHistory
-from datetime import datetime
+from api.models.muscle_group import MuscleGroup
+from datetime import datetime, UTC
 
-# Create database engine
-SQLALCHEMY_DATABASE_URL = "postgresql://postgres:postgres@postgres:5432/training_app"
-engine = create_engine(SQLALCHEMY_DATABASE_URL)
+# Create database engine - using SQLite for local development
+SQLALCHEMY_DATABASE_URL = "sqlite:///./training_app.db"
+engine = create_engine(
+    SQLALCHEMY_DATABASE_URL, connect_args={"check_same_thread": False}
+)
 
-# Create all tables
+# Drop all tables and recreate them
+Base.metadata.drop_all(bind=engine)
 Base.metadata.create_all(bind=engine)
 
 # Create session
@@ -42,22 +54,58 @@ def init_db():
     db.add(workout)
     db.commit()
 
+    # Create muscle groups
+    muscle_groups = [
+        MuscleGroup(
+            name="Chest",
+            description="Chest muscles including pectoralis major and minor",
+            workout_id=workout.id
+        ),
+        MuscleGroup(
+            name="Legs",
+            description="Leg muscles including quadriceps, hamstrings, and calves",
+            workout_id=workout.id
+        ),
+        MuscleGroup(
+            name="Back",
+            description="Back muscles including latissimus dorsi and trapezius",
+            workout_id=workout.id
+        )
+    ]
+    db.add_all(muscle_groups)
+    db.commit()
+
     # Create sample exercises
     exercises = [
         Exercise(
             name="Bench Press",
             description="Chest exercise",
-            workout_id=workout.id
+            muscle_group_id=muscle_groups[0].id,  # Chest
+            sets=3,
+            reps=10,
+            current_weight=0,
+            last_weight=0,
+            record_weight=0
         ),
         Exercise(
             name="Squats",
             description="Leg exercise",
-            workout_id=workout.id
+            muscle_group_id=muscle_groups[1].id,  # Legs
+            sets=3,
+            reps=10,
+            current_weight=0,
+            last_weight=0,
+            record_weight=0
         ),
         Exercise(
             name="Deadlift",
             description="Back exercise",
-            workout_id=workout.id
+            muscle_group_id=muscle_groups[2].id,  # Back
+            sets=3,
+            reps=10,
+            current_weight=0,
+            last_weight=0,
+            record_weight=0
         )
     ]
     db.add_all(exercises)
@@ -68,7 +116,7 @@ def init_db():
         weight_history = WeightHistory(
             exercise_id=exercise.id,
             weight=50.0,  # Starting weight
-            date=datetime.utcnow()
+            date=datetime.now(UTC)
         )
         db.add(weight_history)
     

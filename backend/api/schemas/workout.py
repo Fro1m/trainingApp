@@ -17,6 +17,37 @@ class WeightHistory(WeightHistoryBase):
     class Config:
         from_attributes = True
 
+class ExerciseBase(BaseModel):
+    name: str
+    description: Optional[str] = None
+    sets: int
+    reps: int
+    current_weight: float
+    last_weight: float
+    record_weight: float
+
+class Exercise(ExerciseBase):
+    id: int
+    workout_id: int
+    muscle_group_id: int
+    created_at: datetime
+    updated_at: datetime
+    weight_history: List[WeightHistory]
+
+    class Config:
+        from_attributes = True
+
+class MuscleGroupBase(BaseModel):
+    name: str
+    description: Optional[str] = None
+
+class MuscleGroup(MuscleGroupBase):
+    id: int
+    exercises: List[Exercise]
+
+    class Config:
+        from_attributes = True
+
 class WorkoutBase(BaseModel):
     name: str
     description: Optional[str] = None
@@ -32,6 +63,7 @@ class Workout(WorkoutBase):
     updated_at: datetime
     is_completed: bool
     completed_at: Optional[datetime] = None
+    muscle_groups: List[MuscleGroup]
 
     class Config:
         from_attributes = True

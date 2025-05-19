@@ -1,5 +1,5 @@
-# Use Python 3.8 slim image
-FROM python:3.8-slim
+# Use Python 3.12 slim image
+FROM python:3.12-slim
 
 # Set working directory
 WORKDIR /app
@@ -24,5 +24,6 @@ COPY . .
 # Expose port
 EXPOSE 5000
 
-# Run the application
+# Remove the automatic database initialization
+# CMD ["python", "init_db.py"]
 CMD ["python", "app.py"]
